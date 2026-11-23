@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpeakBetter AI | English Coach</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+:root{--bg:#0b1020;--card:#151d32;--card2:#1c2740;--primary:#7c9cff;--accent:#6ee7b7;--text:#f4f7ff;--muted:#a6b1cc;--danger:#ff8585}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.container{width:min(100% - 30px,850px);margin:auto;padding:30px 0}
+header{text-align:center;margin-bottom:28px}
+.logo{font-size:35px;margin-bottom:10px}
+header h1{margin:0;font-size:30px}
+header p{color:var(--muted);margin-top:10px}
+.card{background:var(--card);border:1px solid #293653;padding:22px;border-radius:20px;margin-bottom:18px}
+.tabs{display:flex;gap:10px;margin-bottom:20px}
+button{border:0;cursor:pointer;padding:13px 16px;border-radius:12px;font-weight:700;font-size:14px;transition:.2s}
+button:hover{opacity:.88}
+button:disabled{opacity:.5;cursor:not-allowed}
+.tab{background:var(--card2);color:var(--text);flex:1}
+.tab.active{background:var(--primary);color:#081022}
+textarea{width:100%;min-height:140px;resize:vertical;padding:16px;border-radius:14px;background:#0d1528;color:white;border:1px solid #354565;font-size:16px;outline:none}
+textarea:focus{border-color:var(--primary)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
+.primary{background:var(--primary);color:#071126}
+.secondary{background:var(--card2);color:white}
+.green{background:var(--accent);color:#06271c}
+.result{display:none;margin-top:20px;padding:18px;background:var(--card2);border-radius:15px}
+.result.show{display:block}
+.result h3{margin-top:0}
+.corrected{font-size:19px;color:var(--accent);line-height:1.6;overflow-wrap:anywhere}
+.explanation{color:var(--muted);line-height:1.6}
+.status{margin-top:12px;color:var(--muted);font-size:13px;line-height:1.5}
+.practice-question{font-size:19px;line-height:1.5;margin:15px 0}
+.feedback{margin-top:15px;line-height:1.65;white-space:pre-wrap}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(max-width:500px){.container{padding-top:20px}header h1{font-size:25px}.card{padding:17px}button{flex:1 1 40%}}
+</style>
+</head>
+<body>
+<div class="container">
+<header><div class="logo">🎓</div><h1>SpeakBetter AI</h1><p>Improve your grammar, pronunciation, and confidence.</p></header>
+<div class="tabs">
+<button class="tab active" onclick="showTab('coach',this)">Grammar Coach</button>
+<button class="tab" onclick="showTab('practice',this)">Practice</button>
+</div>
+<section id="coach">
+<div class="card">
+<h2>✍️ Grammar Correction</h2>
+<p class="explanation">Write or speak a sentence in English. Your coach will check grammar and suggest improvements.</p>
+<textarea id="inputText" placeholder="Example: How much is your age?"></textarea>
+<div class="actions">
+<button class="primary" id="correctBtn" onclick="correctGrammar()">✨ Correct Grammar</button>
+<button class="secondary" onclick="startMic('inputText','status')">🎤 Speak</button>
+<button class="secondary" onclick="clearText()">🗑️ Clear</button>
+</div>
+<div id="status" class="status" aria-live="polite"></div>
+<div id="result" class="result">
+<h3>✅ Corrected Sentence</h3><div id="correctedText" class="corrected"></div>
+<h3>📖 Explanation</h3><div id="explanation" class="explanation"></div>
+<div class="actions"><button class="green" onclick="speakCorrected()">🔊 Listen</button><button class="secondary" onclick="copyCorrected()">📋 Copy</button></div>
+</div>
+</div>
+<div class="card">
+<h2>🗣️ Pronunciation Practice</h2><p class="explanation">Listen to your sentence spoken in English.</p>
+<div class="actions"><button class="primary" onclick="speak(document.getElementById('inputText').value)">🔊 Listen to My Sentence</button><button class="secondary" onclick="stopSpeech()">⏹ Stop</button></div>
+</div>
+</section>
+<section id="practice" class="hidden">
+<div class="card">
+<h2>🎯 English Practice</h2><p class="explanation">Answer the question using a complete English sentence, then check your grammar.</p>
+<div id="question" class="practice-question"></div>
+<textarea id="practiceAnswer" placeholder="Write your answer here..."></textarea>
+<div class="actions"><button class="primary" onclick="checkPractice()">Check My Answer</button><button class="secondary" onclick="nextQuestion()">Next Question ➡️</button><button class="secondary" onclick="startMic('practiceAnswer','practiceFeedback')">🎤 Speak Answer</button></div>
+<div id="practiceFeedback" class="feedback" aria-live="polite"></div>
+</div>
+</section>
+<footer>SpeakBetter AI • Practice a little every day.</footer>
+</div>
+<script>
+function showTab(tab,button){
+ document.getElementById('coach').classList.toggle('hidden',tab!=='coach');
+ document.getElementById('practice').classList.toggle('hidden',tab!=='practice');
+ document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+ button.classList.add('active');
+}
+const grammarRules=[
+[/\bhow much is your age\b/gi,'how old are you'],[/\bhow old you are\b/gi,'how old are you'],
+[/\bwhat you doing\b/gi,'what are you doing'],[/\bwhere you from\b/gi,'where are you from'],
+[/\bwhat happen\b/gi,'what happened'],[/\bi am agree\b/gi,'I agree'],
+[/\bhe don't\b/gi,"he doesn't"],[/\bshe don't\b/gi,"she doesn't"],[/\bit don't\b/gi,"it doesn't"],
+[/\bhe have\b/gi,'he has'],[/\bshe have\b/gi,'she has'],[/\bit have\b/gi,'it has'],
+[/\bi has\b/gi,'I have'],[/\byou has\b/gi,'you have'],[/\bthey has\b/gi,'they have'],[/\bwe has\b/gi,'we have'],
+[/\bdoesn't likes\b/gi,"doesn't like"],[/\bdidn't went\b/gi,"didn't go"],[/\bdidn't ate\b/gi,"didn't eat"],
+[/\bdidn't saw\b/gi,"didn't see"],[/\bdidn't knowed\b/gi,"didn't know"],[/\bi didn't knew\b/gi,"I didn't know"],
+[/\bhe didn't knew\b/gi,"he didn't know"],[/\bshe didn't knew\b/gi,"she didn't know"],
+[/\bi am not understand\b/gi,"I do not understand"],[/\bi no understand\b/gi,"I do not understand"],
+[/\bi can't able\b/gi,"I am not able"],[/\bmore better\b/gi,'better'],[/\bmore easier\b/gi,'easier'],
+[/\bmost easiest\b/gi,'easiest'],[/\bmost best\b/gi,'best'],[/\binformations\b/gi,'information'],
+[/\bfurnitures\b/gi,'furniture'],[/\badvices\b/gi,'advice'],[/\bchildrens\b/gi,'children'],
+[/\bpeoples\b/gi,'people'],[/\bi am gonna to\b/gi,'I am going to'],[/\bi wanna to\b/gi,'I want to'],
+[/\bdiscuss about\b/gi,'discuss'],[/\breturn back\b/gi,'return'],[/\brepeat again\b/gi,'repeat'],
+[/\bkindly please\b/gi,'please'],[/\bcan able to\b/gi,'can'],[/\bcould able to\b/gi,'could'],
+[/\bshould of\b/gi,'should have'],[/\bwould of\b/gi,'would have'],[/\bcould of\b/gi,'could have'],
+[/\btheir is\b/gi,'there is'],[/\byour welcome\b/gi,"you're welcome"],[/\byour right\b/gi,"you're right"],
+[/\byour wrong\b/gi,"you're wrong"],[/\bits a\b/gi,"it's a"],[/\bi has been\b/gi,'I have been'],
+[/\bme and him\b/gi,'he and I'],[/\bme and her\b/gi,'she and I']
+];
+function fallbackCorrection(s){let t=s;grammarRules.forEach(r=>t=t.replace(r[0],r[1]));t=t.replace(/\s+/g,' ').trim();if(t)t=t.charAt(0).toUpperCase()+t.slice(1);if(t&&!/[.!?]$/.test(t))t+='.';return t}
+async function languageToolCheck(text){
+ const response=await fetch('https://api.languagetool.org/v2/check',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({text:text,language:'en-US'})});
+ if(!response.ok)throw new Error('Grammar service response error');
+ const data=await response.json();let corrected=text;let explanations=[];
+ [...data.matches].sort((a,b)=>b.offset-a.offset).forEach(m=>{
+  if(m.replacements?.length){const rep=m.replacements[0].value;corrected=corrected.slice(0,m.offset)+rep+corrected.slice(m.offset+m.length);explanations.push(m.message+(m.replacements.length?(' Suggested: '+m.replacements[0].value):''));}
+ });
+ return {corrected,explanations,matches:data.matches.length};
+}
+async function correctGrammar(){
+ const original=document.getElementById('inputText').value.trim();if(!original){setStatus('Please enter a sentence first.');return}
+ const btn=document.getElementById('correctBtn');btn.disabled=true;setStatus('Checking grammar...');document.getElementById('result').classList.remove('show');
+ let corrected=fallbackCorrection(original),notes=[];
+ try{const api=await languageToolCheck(original);if(api.matches>0)corrected=api.corrected;notes=api.explanations;setStatus('Grammar check complete (online checker).')}
+ catch(e){notes.push('Online grammar checker is unavailable right now. Basic corrections were used; these may not catch every error.');setStatus('Finished using basic corrections. Online checker unavailable.')}
+ corrected=corrected.trim();if(corrected)corrected=corrected.charAt(0).toUpperCase()+corrected.slice(1);if(corrected&&!/[.!?]$/.test(corrected))corrected+='.';
+ document.getElementById('correctedText').textContent=corrected;
+ document.getElementById('explanation').textContent=notes.length?notes.join(' '):'No grammar issues were detected by the checker. Remember, automated checkers can miss some mistakes.';
+ document.getElementById('result').classList.add('show');btn.disabled=false;
+}
+function getSpeechRecognition(){return window.SpeechRecognition||window.webkitSpeechRecognition||null}
+function startMic(targetId,statusId){
+ const SR=getSpeechRecognition();const statusEl=document.getElementById(statusId);
+ if(!SR){statusEl.textContent='Speech recognition is not supported in this browser. Try a supported browser and make sure the site is opened over HTTPS.';return}
+ const recognition=new SR();recognition.lang='en-US';recognition.continuous=false;recognition.interimResults=false;
+ recognition.onstart=()=>statusEl.textContent='🎤 Listening... Speak in English.';
+ recognition.onresult=e=>{document.getElementById(targetId).value=e.results[0][0].transcript;statusEl.textContent='Speech recognized! You can now check your grammar.'};
+ recognition.onerror=e=>{let msg=e.error==='not-allowed'?'Microphone permission denied. Allow microphone access in your browser settings.':e.error==='no-speech'?'No speech detected. Please try again.':'Microphone error: '+e.error;statusEl.textContent=msg};
+ recognition.onend=()=>{};
+ try{recognition.start()}catch(e){statusEl.textContent='Microphone may already be active. Please wait and try again.'}
+}
+function speak(text){if(!text||!window.speechSynthesis){setStatus('Text-to-speech is unavailable in this browser.');return}speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.85;u.pitch=1;speechSynthesis.speak(u)}
+function speakCorrected(){speak(document.getElementById('correctedText').textContent)}
+function stopSpeech(){if(window.speechSynthesis)speechSynthesis.cancel()}
+function clearText(){document.getElementById('inputText').value='';document.getElementById('result').classList.remove('show');setStatus('')}
+function copyCorrected(){let t=document.getElementById('correctedText').textContent;if(!t)return;if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>setStatus('Corrected sentence copied!')).catch(()=>setStatus('Copy failed. Please copy manually.'));else setStatus('Clipboard is not available. Please copy manually.')}
+function setStatus(m){document.getElementById('status').textContent=m}
+const questions=['Introduce yourself in three sentences.','What did you do yesterday?','What are your hobbies?','Describe your favorite food.','What are your plans for tomorrow?','Why do you want to learn English?','Describe a good friend.','What is your favorite subject and why?','What would you do if you had a free day?','Describe your dream job.'];
+let questionIndex=0;
+function loadQuestion(){document.getElementById('question').textContent=questions[questionIndex];document.getElementById('practiceAnswer').value='';document.getElementById('practiceFeedback').textContent=''}
+function nextQuestion(){questionIndex=(questionIndex+1)%questions.length;loadQuestion()}
+async function checkPractice(){
+ const answer=document.getElementById('practiceAnswer').value.trim();const fb=document.getElementById('practiceFeedback');if(!answer){fb.textContent='Please write or speak an answer first.';return}
+ fb.textContent='Checking your answer...';
+ try{const data=await languageToolCheck(answer);if(!data.matches)fb.textContent='✅ No grammar issues were detected. Good job!';else{let corrected=fallbackCorrection(answer);if(data.corrected)corrected=data.corrected;if(corrected&&!/[.!?]$/.test(corrected))corrected+='.';fb.textContent='📝 Suggestions found: '+data.matches+'\nCorrected version: '+corrected+'\n\nExplanation(s):\n'+data.explanations.join('\n')}}
+ catch(e){fb.textContent='Online grammar checking is temporarily unavailable. Please try again later.'}
+}
+loadQuestion();
+</script>
+</body>
+</html>
