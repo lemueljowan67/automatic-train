@@ -1,0 +1,585 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpeakBetter AI</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #0b1020;
+    color: #f1f5f9;
+    min-height: 100vh;
+}
+
+header {
+    padding: 24px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #202a40;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 800;
+    color: #a78bfa;
+}
+
+.logo span {
+    color: white;
+}
+
+nav a {
+    color: #aab4c8;
+    text-decoration: none;
+    margin-left: 24px;
+    font-size: 14px;
+}
+
+.hero {
+    text-align: center;
+    padding: 70px 20px 40px;
+}
+
+.hero h1 {
+    font-size: clamp(32px, 6vw, 55px);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.hero h1 span {
+    color: #a78bfa;
+}
+
+.hero p {
+    color: #9ca9c0;
+    margin-top: 18px;
+    line-height: 1.7;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: #131b2e;
+    border: 1px solid #26334a;
+    border-radius: 18px;
+    padding: 25px;
+    margin-bottom: 24px;
+}
+
+.card h2 {
+    font-size: 19px;
+    margin-bottom: 12px;
+}
+
+.card p {
+    color: #9ca9c0;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 160px;
+    resize: vertical;
+    background: #0b1020;
+    border: 1px solid #34425c;
+    border-radius: 12px;
+    padding: 18px;
+    color: white;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+}
+
+textarea:focus {
+    border-color: #a78bfa;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 13px 18px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.primary {
+    background: #8b5cf6;
+    color: white;
+}
+
+.secondary {
+    background: #253149;
+    color: white;
+}
+
+.result {
+    display: none;
+    margin-top: 25px;
+    padding: 20px;
+    background: #0b1020;
+    border-radius: 12px;
+    border: 1px solid #34425c;
+}
+
+.result h3 {
+    color: #a78bfa;
+    margin-bottom: 10px;
+}
+
+.result-text {
+    font-size: 17px;
+    line-height: 1.7;
+    word-wrap: break-word;
+}
+
+.info {
+    margin-top: 15px;
+    color: #9ca9c0;
+    font-size: 13px;
+}
+
+.practice-input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #34425c;
+    background: #0b1020;
+    color: white;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-top: 30px;
+}
+
+.feature {
+    background: #131b2e;
+    border: 1px solid #26334a;
+    padding: 22px;
+    border-radius: 15px;
+}
+
+.feature h3 {
+    margin-bottom: 10px;
+    color: #c4b5fd;
+}
+
+.feature p {
+    color: #9ca9c0;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+footer {
+    text-align: center;
+    color: #64748b;
+    padding: 35px;
+    font-size: 13px;
+}
+
+@media(max-width:600px) {
+    header {
+        padding: 20px;
+    }
+
+    nav a {
+        margin-left: 10px;
+        font-size: 12px;
+    }
+
+    .hero {
+        padding-top: 50px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Speak<span>Better</span></div>
+    <nav>
+        <a href="#grammar">Grammar</a>
+        <a href="#practice">Practice</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Speak English<br><span>with confidence.</span></h1>
+    <p>Improve your grammar, pronunciation, and vocabulary.<br>
+    Your personal English learning space.</p>
+</section>
+
+<div class="container">
+
+    <!-- GRAMMAR CHECKER -->
+    <section class="card" id="grammar">
+        <h2>✍️ Grammar & Sentence Corrector</h2>
+        <p>Type or speak a sentence. We'll help you make it sound more natural.</p>
+
+        <textarea id="sentence"
+        placeholder="Example: She don't know what happen yesterday..."></textarea>
+
+        <div class="buttons">
+            <button class="primary" onclick="correctGrammar()">
+                ✨ Correct Grammar
+            </button>
+
+            <button class="secondary" onclick="startVoiceInput()">
+                🎤 Speak
+            </button>
+
+            <button class="secondary" onclick="clearText()">
+                Clear
+            </button>
+        </div>
+
+        <div class="result" id="result">
+            <h3>Corrected Sentence</h3>
+            <div class="result-text" id="corrected"></div>
+
+            <div class="buttons">
+                <button class="primary" onclick="speakText()">
+                    🔊 Listen
+                </button>
+
+                <button class="secondary" onclick="copyText()">
+                    📋 Copy
+                </button>
+            </div>
+
+            <div class="info" id="explanation"></div>
+        </div>
+    </section>
+
+    <!-- PRONUNCIATION -->
+    <section class="card" id="practice">
+        <h2>🗣️ Pronunciation Practice</h2>
+        <p>Enter a word or sentence and listen to how it is pronounced.</p>
+
+        <input class="practice-input" id="pronunciation"
+        placeholder="Example: How are you doing today?">
+
+        <div class="buttons">
+            <button class="primary" onclick="practiceSpeech()">
+                🔊 Listen to Pronunciation
+            </button>
+
+            <button class="secondary" onclick="startPronunciation()">
+                🎤 Practice Speaking
+            </button>
+        </div>
+
+        <div class="info" id="speechResult"></div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features">
+
+        <div class="feature">
+            <h3>✍️ Grammar</h3>
+            <p>Learn to construct correct sentences and avoid common grammar mistakes.</p>
+        </div>
+
+        <div class="feature">
+            <h3>🗣️ Pronunciation</h3>
+            <p>Listen to English words and practice speaking clearly.</p>
+        </div>
+
+        <div class="feature">
+            <h3>📚 Vocabulary</h3>
+            <p>Discover better words and more natural expressions.</p>
+        </div>
+
+    </section>
+
+</div>
+
+<footer>
+    SpeakBetter — Learn. Practice. Improve.
+</footer>
+
+<script>
+
+// BASIC GRAMMAR CORRECTION
+
+function correctGrammar() {
+
+    let text = document.getElementById("sentence").value.trim();
+
+    if (!text) {
+        alert("Please enter a sentence first!");
+        return;
+    }
+
+    let corrected = text;
+    let changes = [];
+
+    const rules = [
+        [/\bi\b/g, "I", "Capitalize 'I'"],
+        [/\bdont\b/gi, "don't", "Corrected don't"],
+        [/\bdoesnt\b/gi, "doesn't", "Corrected doesn't"],
+        [/\bdidnt\b/gi, "didn't", "Corrected didn't"],
+        [/\bcant\b/gi, "can't", "Corrected can't"],
+        [/\bwont\b/gi, "won't", "Corrected won't"],
+        [/\bim\b/gi, "I'm", "Corrected I'm"],
+        [/\bive\b/gi, "I've", "Corrected I've"],
+        [/\byoure\b/gi, "you're", "Corrected you're"],
+        [/\btheyre\b/gi, "they're", "Corrected they're"],
+        [/\bweve\b/gi, "we've", "Corrected we've"],
+        [/\bthats\b/gi, "that's", "Corrected that's"],
+        [/\bwhats\b/gi, "what's", "Corrected what's"],
+        [/\bcouldnt\b/gi, "couldn't", "Corrected couldn't"],
+        [/\bshouldnt\b/gi, "shouldn't", "Corrected shouldn't"],
+        [/\bwouldnt\b/gi, "wouldn't", "Corrected wouldn't"],
+        [/\bdoesnt know\b/gi, "doesn't know", "Corrected verb"],
+        [/\bdont know\b/gi, "don't know", "Corrected verb"],
+        [/\bhe dont\b/gi, "he doesn't", "Corrected subject and verb"],
+        [/\bshe dont\b/gi, "she doesn't", "Corrected subject and verb"],
+        [/\bit dont\b/gi, "it doesn't", "Corrected subject and verb"],
+        [/\bhe do\b/gi, "he does", "Corrected subject and verb"],
+        [/\bshe do\b/gi, "she does", "Corrected subject and verb"],
+        [/\bit do\b/gi, "it does", "Corrected subject and verb"],
+        [/\bhe have\b/gi, "he has", "Corrected subject and verb"],
+        [/\bshe have\b/gi, "she has", "Corrected subject and verb"],
+        [/\bit have\b/gi, "it has", "Corrected subject and verb"],
+        [/\bthey was\b/gi, "they were", "Corrected subject and verb"],
+        [/\bwe was\b/gi, "we were", "Corrected subject and verb"],
+        [/\byou was\b/gi, "you were", "Corrected subject and verb"],
+        [/\bi was\b/gi, "I was", "Corrected capitalization"],
+        [/\bhe go\b/gi, "he goes", "Corrected verb"],
+        [/\bshe go\b/gi, "she goes", "Corrected verb"],
+        [/\bhe like\b/gi, "he likes", "Corrected verb"],
+        [/\bshe like\b/gi, "she likes", "Corrected verb"],
+        [/\bhe want\b/gi, "he wants", "Corrected verb"],
+        [/\bshe want\b/gi, "she wants", "Corrected verb"],
+        [/\bhe eat\b/gi, "he eats", "Corrected verb"],
+        [/\bshe eat\b/gi, "she eats", "Corrected verb"],
+        [/\bhe play\b/gi, "he plays", "Corrected verb"],
+        [/\bshe play\b/gi, "she plays", "Corrected verb"],
+        [/\bhe is\b/gi, "he is", "Corrected verb"],
+        [/\bshe are\b/gi, "she is", "Corrected verb"],
+        [/\bhe are\b/gi, "he is", "Corrected verb"],
+        [/\bi are\b/gi, "I am", "Corrected verb"],
+        [/\bi is\b/gi, "I am", "Corrected verb"],
+        [/\byou is\b/gi, "you are", "Corrected verb"],
+        [/\bthey is\b/gi, "they are", "Corrected verb"],
+        [/\bwe is\b/gi, "we are", "Corrected verb"],
+        [/\bwasnt\b/gi, "wasn't", "Corrected contraction"],
+        [/\bwerent\b/gi, "weren't", "Corrected contraction"],
+        [/\bhasnt\b/gi, "hasn't", "Corrected contraction"],
+        [/\bhavent\b/gi, "haven't", "Corrected contraction"],
+        [/\bthier\b/gi, "their", "Corrected spelling"],
+        [/\bteh\b/gi, "the", "Corrected spelling"],
+        [/\brecieve\b/gi, "receive", "Corrected spelling"],
+        [/\bseperate\b/gi, "separate", "Corrected spelling"],
+        [/\bdefinately\b/gi, "definitely", "Corrected spelling"],
+        [/\balot\b/gi, "a lot", "Corrected spelling"],
+        [/\bcuz\b/gi, "because", "Improved vocabulary"],
+        [/\bu\b/gi, "you", "Improved vocabulary"],
+        [/\bur\b/gi, "your", "Improved vocabulary"]
+    ];
+
+    rules.forEach(rule => {
+        let before = corrected;
+        corrected = corrected.replace(rule[0], rule[1]);
+
+        if (before !== corrected) {
+            changes.push(rule[2]);
+        }
+    });
+
+    // Capitalize the beginning
+    corrected = corrected.charAt(0).toUpperCase() + corrected.slice(1);
+
+    // Add punctuation if missing
+    if (!/[.!?]$/.test(corrected)) {
+        corrected += ".";
+        changes.push("Added punctuation");
+    }
+
+    document.getElementById("corrected").textContent = corrected;
+
+    document.getElementById("explanation").textContent =
+        changes.length > 0
+        ? "Changes: " + [...new Set(changes)].join(", ")
+        : "No obvious errors found. This basic checker may miss more complex grammar issues.";
+
+    document.getElementById("result").style.display = "block";
+}
+
+
+// TEXT TO SPEECH
+
+function speakText() {
+    let text = document.getElementById("corrected").textContent;
+    speak(text);
+}
+
+function practiceSpeech() {
+    let text = document.getElementById("pronunciation").value.trim();
+
+    if (!text) {
+        alert("Enter a word or sentence first!");
+        return;
+    }
+
+    speak(text);
+}
+
+function speak(text) {
+    if (!window.speechSynthesis) {
+        alert("Text-to-speech is not supported in this browser.");
+        return;
+    }
+
+    speechSynthesis.cancel();
+
+    let utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.rate = 0.85;
+    utterance.pitch = 1;
+
+    speechSynthesis.speak(utterance);
+}
+
+
+// VOICE INPUT
+
+function startVoiceInput() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Voice recognition is not supported in this browser. Try Chrome.");
+        return;
+    }
+
+    let recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    recognition.onresult = function(event) {
+        document.getElementById("sentence").value =
+            event.results[0][0].transcript;
+    };
+
+    recognition.onerror = function() {
+        alert("Voice recognition failed. Please try again.");
+    };
+
+    recognition.start();
+}
+
+
+// PRONUNCIATION PRACTICE
+
+function startPronunciation() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Speech recognition is not supported in this browser.");
+        return;
+    }
+
+    let expected =
+        document.getElementById("pronunciation").value.trim();
+
+    if (!expected) {
+        alert("Enter a sentence first!");
+        return;
+    }
+
+    let recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+
+    recognition.onresult = function(event) {
+
+        let spoken = event.results[0][0].transcript;
+
+        document.getElementById("speechResult").innerHTML =
+            "You said: <strong>" + spoken +
+            "</strong><br><br>Practice by listening to the correct pronunciation " +
+            "and repeating the sentence slowly.";
+
+    };
+
+    recognition.onerror = function() {
+        document.getElementById("speechResult").textContent =
+            "Couldn't recognize your speech. Try again.";
+    };
+
+    recognition.start();
+}
+
+
+// COPY
+
+function copyText() {
+    let text = document.getElementById("corrected").textContent;
+
+    navigator.clipboard.writeText(text)
+        .then(() => alert("Copied successfully!"))
+        .catch(() => alert("Unable to copy."));
+}
+
+
+// CLEAR
+
+function clearText() {
+    document.getElementById("sentence").value = "";
+    document.getElementById("result").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>
